@@ -106,17 +106,7 @@ export default {
         };
     },
     created() {
-        // 把内部方法暴露到外面
-        const controller = {
-            reassign: this.reassign,
-            append: this.append,
-            prepend: this.prepend
-        };
-        if (this.assistant) getComponentController(this.assistant, controller);
-        this.$emit('created', controller);
-    },
-    activated() {
-        this.changeScrollDistance(this.cache.scrollTop);
+        this.exposeInner();
     },
     mounted() {
         this.updateRenderingPageCount();
@@ -124,12 +114,32 @@ export default {
         this.bindScrollEvt();
         this.bindRisizeEvt();
     },
+    activated() {
+        this.updateRenderingPageCount();
+        this.bindScrollEvt();
+        this.bindRisizeEvt();
+        this.changeScrollDistance(this.cache.scrollTop);
+    },
+    deactivated() {
+        this.destroyScrollEvt();
+        this.destroyRisizeEvt();
+    },
     beforeDestroy() {
         this.destroyScrollEvt();
         this.destroyRisizeEvt();
         clearTimeout(this.updateTimer);
     },
     methods: {
+        /** 把内部方法暴露到外面 */
+        exposeInner() {
+            const controller = {
+                reassign: this.reassign,
+                append: this.append,
+                prepend: this.prepend
+            };
+            if (this.assistant) getComponentController(this.assistant, controller);
+            this.$emit('created', controller);
+        },
         /** 重新赋值
          *
          * **注意，此方法涉及外面调用**

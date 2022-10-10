@@ -1,0 +1,45 @@
+{
+  "name": "virtual-scroller",
+  "version": "1.0.0",
+  "description": "Vue components for large list",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamkitGO/virtual-scroller.git"
+  },
+  "keywords": [
+    "vue",
+    "virtual",
+    "list",
+    "table",
+    "scroll",
+    "big-data",
+    "large-list",
+    "infinite",
+    "virtual-list",
+    "virtual-scroll"
+  ],
+  "author": "jamkitGO",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jamkitGO/virtual-scroller/issues"
+  },
+  "homepage": "https://github.com/jamkitGO/virtual-scroller#readme",
+  "peerDependencies": {
+    "vue": "^2.6.11"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-vue": "^9.4.0",
+    "prettier": "^2.4.1",
+    "vue": "^2.7.10",
+    "vue-template-compiler": "^2.7.10"
+  }
+}

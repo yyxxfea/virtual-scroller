@@ -48,18 +48,13 @@ export default {
         /** 当不是根元素是滚动层时，需传入返回滚动元素的方法 */
         getScrollElem: { type: Function, default: defaultGetScrollElem },
 
-        /** 助手，初始化时将会填充方法，供外面调用该组件方法（因使用本组件需主动调用特定的组件方法）。
-         *
-         * 可用方法：
-         * - reassign
-         * - append
-         * - prepend
-         */
+        /** 助手，初始化时将会填充方法，供外面调用该组件方法（因使用本组件需主动调用特定的组件方法）。*/
         assistant: Object
     },
     data() {
         return {
             updateTimer: null,
+            toEndTimer: null,
             pages: [],
             pageOptions: {
                 minItemSize: this.minItemSize, // 一行最小高度
@@ -109,7 +104,7 @@ export default {
         this.exposeInner();
     },
     mounted() {
-        this.updateRenderingPageCount();
+        this.updateRenderingPageCount(); // 组件初始状态可能是隐藏的，所以后续可能需要调用此方法或手动 refresh
         this.reassign();
         this.bindScrollEvt();
         this.bindRisizeEvt();
@@ -128,14 +123,26 @@ export default {
         this.destroyScrollEvt();
         this.destroyRisizeEvt();
         clearTimeout(this.updateTimer);
+        clearTimeout(this.toEndTimer);
     },
     methods: {
+        /** 刷新视图 */
+        refresh() {
+            this.updateRenderingPageCount();
+            this.updatePageNum();
+        },
         /** 把内部方法暴露到外面 */
         exposeInner() {
             const controller = {
+                refresh: this.refresh,
                 reassign: this.reassign,
                 append: this.append,
-                prepend: this.prepend
+                prepend: this.prepend,
+                scrollTo: val => {
+                    this.changeScrollDistance(val);
+                },
+                toStart: this.toStart,
+                toEnd: this.toEnd
             };
             if (this.assistant) getComponentController(this.assistant, controller);
             this.$emit('created', controller);
@@ -153,6 +160,7 @@ export default {
             this.pageOptions.totalPageCount = pages.length;
             this.cache.dataLength = dataLength;
 
+            this.updateRenderingPageCount();
             if (isToTop) {
                 this.updatePageNum(true);
                 this.changeScrollDistance(0, true);
@@ -181,6 +189,7 @@ export default {
             this.appendData(pages, theLastPage.index[0], insertingLen + theLastPageSize);
             this.pageOptions.totalPageCount = pages.length;
             this.cache.dataLength += insertingLen;
+            this.updateRenderingPageCount();
             this.updatePageNum();
             // fix #1
             // this.$nextTick(() => {
@@ -222,13 +231,35 @@ export default {
             this.cache.pageNum += offsetPageCount; // 保持当前页码相对不变
             this.cache.endPageNum += offsetPageCount; // 保持当前页码相对不变
             this.prependRepairman.prepare(offsetPageCount, oldFirstPageHeight);
+            this.updateRenderingPageCount();
         },
+        /** 主动改变滚动距离
+         *
+         * **注意，此方法涉及外面调用**
+         */
         changeScrollDistance(val, changeCacheImmediately) {
             this.getScrollElem().scrollTop = val;
             // 马上改变 cache.scrollTop
             // 因为 scroll 事件的回调不是立即触发的，有时候会触发不了。
             // 比如把 data 置空，并执行本方法时，回调触发前时候其实 DOM 已经更新了，滚动高度已经不存在
             if (changeCacheImmediately) this.cache.scrollTop = val;
+        },
+        toStart() {
+            this.changeScrollDistance(0);
+        },
+        toEnd() {
+            let scrollHeight;
+            const toEnd = () => {
+                scrollHeight = this.getScrollElem().scrollHeight;
+                this.changeScrollDistance(scrollHeight);
+            };
+            toEnd();
+
+            // 因为高度是动态去定的，避免不到底或者最底时有加载更多，只多尝试一次。偶尔会失败。
+            // 不用 nextTick 是因为这里使用 nextTick 会比因滚动而页码变动触发的 render 跑的快
+            this.toEndTimer = setTimeout(() => {
+                if (scrollHeight !== this.getScrollElem().scrollHeight) toEnd();
+            }, 0);
         },
         appendData(pages, startIndex, addend) {
             const { minItemSize, pageSize } = this.pageOptions;
@@ -509,8 +540,7 @@ export default {
             window.removeEventListener('resize', this.resizeHandle);
         },
         resizeHandle() {
-            this.updateRenderingPageCount();
-            this.updatePageNum();
+            this.refresh();
         },
 
         /** DOM 改变后，校正一些数据 */

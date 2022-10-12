@@ -1,3 +1,6 @@
-export { default as VirtualScroller } from './virtual-scroller.vue';
+import VirtualScroller from './virtual-scroller.vue';
 
+export default VirtualScroller;
+
+export { VirtualScroller };
 export { getComponentController } from './utils';

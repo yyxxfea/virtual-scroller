@@ -5,6 +5,10 @@ Vue.use(VueRouter);
 
 const routes = [
     {
+        path: '',
+        redirect: '/scroll'
+    },
+    {
         path: '/home',
         component: () => import('../views/home/home.vue')
     },

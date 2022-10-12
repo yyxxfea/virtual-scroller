@@ -1,5 +1,4 @@
 <script>
-// import { VirtualScroller } from '../../../../../src/vue';
 import { VirtualScroller } from 'virtual-scroller/src/vue';
 import DivPlaceholder from './div-placeholder.vue';
 

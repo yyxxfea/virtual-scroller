@@ -7,6 +7,8 @@
             @reassign="reassign"
             @append="append"
             @prepend="prepend"
+            @scrollTo="scrollTo"
+            @toEnd="toEnd"
         ></Controls>
 
         <ExampleDiv
@@ -51,7 +53,7 @@ export default {
     created() {},
     mounted() {
         setTimeout(() => {
-            // this.initPage();
+            this.initPage();
         }, 200);
     },
     methods: {
@@ -81,6 +83,12 @@ export default {
             }
             const newRows = this.example.prepend(num);
             this.example.vscrollController.prepend(newRows);
+        },
+        scrollTo(val) {
+            this.example.vscrollController.scrollTo(val);
+        },
+        toEnd() {
+            this.example.vscrollController.toEnd();
         },
         pretendAsync() {
             return new Promise(resolve => {

@@ -7,6 +7,7 @@ class Example {
         type: 'div',
         isAsync: true,
         asyncDuration: 300,
+        scrollDistance: 600,
         initNum: 290,
         assignNum: 300,
         prependNum: 30,

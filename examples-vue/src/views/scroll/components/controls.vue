@@ -10,7 +10,7 @@
         </div>
         <div class="mb-10">
             <label>
-                是否异步：
+                数据来源是否异步：
                 <input type="checkbox" v-model="controls.isAsync" />
             </label>
         </div>
@@ -27,6 +27,20 @@
             生成行随机高度的基数
             <input class="input w-100px mr-5" type="number" v-model.number="controls.randomBaseH" />
         </div>
+        <div class="mb-10">
+            滚动距离：
+            <input class="input w-100px mr-5" type="number" v-model.number="controls.scrollDistance" />
+            <button class="button mr-5" @click="scrollTo(controls.scrollDistance)">go</button>
+            <button class="button mr-5" @click="scrollTo(0)">置顶</button>
+            <button class="button mr-5" @click="scrollTo(500)">500</button>
+            <button class="button mr-5" @click="scrollTo(1000)">1000</button>
+            <button class="button mr-5" @click="scrollTo(5000)">5000</button>
+            <button class="button mr-5" @click="toEnd()">置底</button>
+        </div>
+
+        <h3 class="mt-20">变更数据：</h3>
+        <hr class="mb-10" />
+
         <div class="mb-10">
             重置：
             <input class="input w-100px mr-5" type="number" v-model.number="controls.assignNum" />
@@ -86,6 +100,12 @@ export default {
         },
         prependData(num = this.controls.prependNum) {
             this.$emit('prepend', num);
+        },
+        scrollTo(val) {
+            this.$emit('scrollTo', val);
+        },
+        toEnd() {
+            this.$emit('toEnd');
         }
     }
 };
